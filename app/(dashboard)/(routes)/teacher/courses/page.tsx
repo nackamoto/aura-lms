@@ -1,7 +1,12 @@
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 export default async function PageCourses() {
   return (
-    <div>
-      <h1>Courses</h1>
-    </div>
+    <main className="p-6">
+      <Link href={`/teacher/create`}>
+        <Button>New Course</Button>
+      </Link>
+    </main>
   );
 }
