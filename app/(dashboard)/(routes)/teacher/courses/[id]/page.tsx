@@ -1,11 +1,13 @@
 import { IconBadge } from "@/components/common/icon-badge";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { LayoutDashboard } from "lucide-react";
+import { CircleDollarSign, LayoutDashboard, ListChecks } from "lucide-react";
 import { redirect } from "next/navigation";
 import TitleForm from "./_components/title-form";
 import DescriptionForm from "./_components/description-form";
 import ImageForm from "./_components/image-form";
+import CategoryForm from "./_components/category-form";
+import PriceForm from "./_components/price-form";
 
 export default async function PageCourseDetails({
   params,
@@ -22,6 +24,12 @@ export default async function PageCourseDetails({
     },
   });
   if (!course) redirect(`/`);
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+  console.log(categories);
   const requiredFields = [
     course.title,
     course.description,
@@ -48,6 +56,27 @@ export default async function PageCourseDetails({
           <TitleForm initialData={{ title: course.title }} courseId={id} />
           <DescriptionForm initialData={course} courseId={id} />
           <ImageForm initialData={course} courseId={id} />
+          <CategoryForm
+            initialData={course}
+            courseId={id}
+            options={categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+          />
+        </div>
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={ListChecks} variant="default" size="sm" />
+              <h2 className="text-xl">{`Course chapters`}</h2>
+            </div>
+          </div>
+          <div className="flex items-center gap-x-2">
+            <IconBadge icon={CircleDollarSign} variant="default" size="sm" />
+            <h2 className="text-xl">{`Sell your course`}</h2>
+          </div>
+          <PriceForm initialData={course} courseId={id} />
         </div>
       </section>
     </main>
