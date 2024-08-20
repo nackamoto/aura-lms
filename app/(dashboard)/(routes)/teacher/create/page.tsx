@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
+import axios from "axios";
 import {
   Form,
   FormControl,
@@ -15,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z
@@ -24,6 +26,7 @@ const formSchema = z.object({
     .min(6, { message: "Title must be at least 6 characters" }),
 });
 export default function PageCreateCourse() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,10 +37,12 @@ export default function PageCreateCourse() {
   const { isValid, isSubmitting } = form.formState;
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    toast.success("Course created");
+    const res = await axios.post("/api/courses", data);
+    if (res?.status) {
+      toast.success("Course created");
+      router.push(`/teacher/courses/${res?.data?.id}`);
+    }
   };
-
   return (
     <main className="max-w-5xl mx-auto flex md:items-center md:justify-center h-full p-6">
       <section>
